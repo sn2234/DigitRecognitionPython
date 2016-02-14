@@ -1,18 +1,22 @@
-import csv
+
 import numpy as np
 import matplotlib.image as img
 import matplotlib.pyplot as plt
+from sklearn import svm
 
-rawData = []
+import DataModel
 
-with open("..\\train.csv", "r") as f:
-    reader = csv.reader(f)
-    for i in range(10):
-        rawData.append(next(reader))
+(x, y) = DataModel.loadData("..\\train.csv")
 
-tmp = np.array(rawData)
+(x_train, x_cv, y_train, y_cv) = DataModel.splitData(x, y)
 
-y = tmp[1:, 0].astype(float)
-x = tmp[1:, 1:].astype(float)
+clf = svm.SVC(kernel = "rbf", C=0.9)
 
-plt.imshow((x/255)[0].reshape((28, 28)))
+x_sub = x_train[:1000,:]
+y_sub = y_train[:1000]
+
+clf.fit(x_sub, y_sub)
+
+y_pred = clf.predict(x_cv)
+
+err_rate = np.mean([1 if a != b else 0 for (a,b) in zip(y_pred, y_cv)])
