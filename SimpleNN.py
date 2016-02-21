@@ -37,7 +37,7 @@ class SimpleNN:
         a3 = expit(z3)
 
         # Compute non-regularized cost
-        xx = -1*(np.transpose(yy) @ xlog(a3)) - (np.transpose(1 - yy) @ xlog(1 - a3))
+        xx = -1*(yy * xlog(a3)) - ((1 - yy) * xlog(1 - a3))
 
         # Compute regularization parameter
         reg = sum([np.sum(t[1:,:]*t[1:,:]) for t in self.theta])*lmb/(2*numberOfSamples)
