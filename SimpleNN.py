@@ -9,10 +9,14 @@ def sigmoidGradient(x):
 xlog = np.vectorize(lambda x: m.log(1e-17) if x == 0 else m.log(x))
 
 class SimpleNN:
+    s = []
     #s = [784, 100, 10]
-    s = [400, 25, 10]
+    #s = [400, 25, 10]
 
     theta = []
+
+    def __init__(self, layers):
+        self.s = layers
 
     def setRandomWeights(self):
         self.theta = list((np.random.random((self.s[0]+1, self.s[1])), 
@@ -61,6 +65,26 @@ class SimpleNN:
             (np.transpose(delta3)@a2)/numberOfSamples + (lmb/numberOfSamples)*np.transpose(theta_reg2)]
 
         return (cost, theta_grad)
+
+    def predictProbabilities(self, x):
+        numberOfSamples = x.shape[0]
+
+        h1 = expit(np.hstack((np.ones((numberOfSamples, 1)), x)) @ self.theta[0])
+        h2 = expit(np.hstack((np.ones((numberOfSamples, 1)), h1)) @ self.theta[1])
+
+        return h2
+
+    def predictClass(self, x):
+        prob = self.predictProbabilities(x)
+        
+        pmax = 0.0
+        imax = 0
+        for i in range(len(prob)):
+            if prob[i] > pmax:
+                pmax = prob[i]
+                imax = i
+
+        return imax+1
 
 #s = SimpleNN()
 #s.setRandomWeights()
