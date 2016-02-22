@@ -91,8 +91,8 @@ class SimpleNN:
 
     def combineTheta(self, theta):
         return np.hstack((
-            theta[0].reshape((theta[0].size, 1)),
-            theta[0].reshape((theta[0].size, 1))
+            theta[0].reshape((theta[0].size,)),
+            theta[1].reshape((theta[1].size,))
             ))
 
     def splitTheta(self, combinedTheta):
@@ -112,7 +112,7 @@ class SimpleNN:
     def computeGrad(self, combinedTheta, x, y, lmb):
         th = self.splitTheta(combinedTheta)
         (_, grad) = self.computeCostGrad(th, x, y, lmb)
-        return grad
+        return self.combineTheta(grad)
 
     def train(self, x, y, lmb):
         self.setRandomWeights()
@@ -121,11 +121,12 @@ class SimpleNN:
         optimizedTheta = minimize(
             lambda p: self.computeCost(p, x, y, lmb),
             combinedTheta,
-            method = 'BFGS',
+            method = 'CG',
             jac = lambda p: self.computeGrad(p, x, y, lmb),
-            options={'disp': True})
+            callback = lambda xk: print("Iteration complete!"),
+            options={'disp': True, 'maxiter' : 5})
 
-        self.theta = self.splitTheta(optimizedTheta)
+        self.theta = self.splitTheta(optimizedTheta.x)
 
         return self.theta
 

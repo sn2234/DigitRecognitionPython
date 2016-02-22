@@ -19,3 +19,7 @@ y = data["y"]
 predictions = [s.predictClass(w) for w in x]
 
 err_rate = np.mean([1 if pred != check else 0 for (pred, check) in zip(y, predictions)])
+
+print("Error rate with pre-computed paramaters: {0}", err_rate)
+
+s.train(x, y, 0.5)
