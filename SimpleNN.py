@@ -1,6 +1,7 @@
 import numpy as np
 import math as m
 from scipy.special import expit
+from scipy.optimize import minimize
 
 def sigmoidGradient(x):
     t = expit(x)
@@ -19,10 +20,10 @@ class SimpleNN:
         self.s = layers
 
     def setRandomWeights(self):
-        self.theta = list((np.random.random((self.s[0]+1, self.s[1])), 
-                     np.random.random((self.s[1]+1, self.s[2]))))
+        self.theta = [np.random.random((self.s[0]+1, self.s[1])), 
+                      np.random.random((self.s[1]+1, self.s[2]))]
 
-    def computeCostGrad(self, x, y, lmb):
+    def computeCostGrad(self, theta, x, y, lmb):
         numberOfSamples = x.shape[0]
 
         # Transform y to 0/1 vector
@@ -33,10 +34,10 @@ class SimpleNN:
 
         # Compute activations
         a1 = np.hstack((np.ones((numberOfSamples, 1)), x))
-        z2 = a1 @ self.theta[0]
+        z2 = a1 @ theta[0]
 
         a2 = np.hstack((np.ones((numberOfSamples, 1)), expit(z2)))
-        z3 = a2 @ self.theta[1]
+        z3 = a2 @ theta[1]
 
         a3 = expit(z3)
 
@@ -44,7 +45,7 @@ class SimpleNN:
         xx = -1*(yy * xlog(a3)) - ((1 - yy) * xlog(1 - a3))
 
         # Compute regularization parameter
-        reg = sum([np.sum(t[1:,:]*t[1:,:]) for t in self.theta])*lmb/(2*numberOfSamples)
+        reg = sum([np.sum(t[1:,:]*t[1:,:]) for t in theta])*lmb/(2*numberOfSamples)
 
         # Total cost
         cost = np.sum(xx)/numberOfSamples + reg
@@ -52,12 +53,12 @@ class SimpleNN:
         # Compute backproparation gradients
         delta3 = a3 - yy
         delta2 = (
-            np.transpose(self.theta[1] @ np.transpose(delta3)) * np.hstack((np.ones((numberOfSamples, 1)), sigmoidGradient(z2))))[:,1:]
+            np.transpose(theta[1] @ np.transpose(delta3)) * np.hstack((np.ones((numberOfSamples, 1)), sigmoidGradient(z2))))[:,1:]
 
-        theta_reg1 = self.theta[0].copy()
+        theta_reg1 = theta[0].copy()
         theta_reg1[:, 0] = np.zeros((theta_reg1.shape[0],))
 
-        theta_reg2 = self.theta[1].copy()
+        theta_reg2 = theta[1].copy()
         theta_reg2[:, 0] = np.zeros((theta_reg2.shape[0],))
 
         theta_grad = [
@@ -66,16 +67,18 @@ class SimpleNN:
 
         return (cost, theta_grad)
 
-    def predictProbabilities(self, x):
+    def predictProbability(self, x):
         numberOfSamples = x.shape[0]
 
-        h1 = expit(np.hstack((np.ones((numberOfSamples, 1)), x)) @ self.theta[0])
-        h2 = expit(np.hstack((np.ones((numberOfSamples, 1)), h1)) @ self.theta[1])
+        h1 = expit(
+            np.transpose(
+                np.vstack((np.ones((1,1)), x.reshape((numberOfSamples,1))))) @ self.theta[0])
+        h2 = expit(np.hstack((np.ones((1, 1)), h1)) @ self.theta[1])
 
-        return h2
+        return h2.reshape((h2.size,))
 
     def predictClass(self, x):
-        prob = self.predictProbabilities(x)
+        prob = self.predictProbability(x)
         
         pmax = 0.0
         imax = 0
@@ -85,6 +88,46 @@ class SimpleNN:
                 imax = i
 
         return imax+1
+
+    def combineTheta(self, theta):
+        return np.hstack((
+            theta[0].reshape((theta[0].size, 1)),
+            theta[0].reshape((theta[0].size, 1))
+            ))
+
+    def splitTheta(self, combinedTheta):
+        t1_len = (self.s[0]+1) * self.s[1]
+        t1 = combinedTheta[:t1_len].reshape((self.s[0]+1, self.s[1]))
+
+        t2_len = (self.s[1]+1) * self.s[2]
+        t2 = combinedTheta[t1_len:].reshape((self.s[1]+1, self.s[2]))
+
+        return [t1, t2]
+
+    def computeCost(self, combinedTheta, x, y, lmb):
+        th = self.splitTheta(combinedTheta)
+        (cost, _) = self.computeCostGrad(th, x, y, lmb)
+        return cost
+
+    def computeGrad(self, combinedTheta, x, y, lmb):
+        th = self.splitTheta(combinedTheta)
+        (_, grad) = self.computeCostGrad(th, x, y, lmb)
+        return grad
+
+    def train(self, x, y, lmb):
+        self.setRandomWeights()
+
+        combinedTheta = self.combineTheta(self.theta)
+        optimizedTheta = minimize(
+            lambda p: self.computeCost(p, x, y, lmb),
+            combinedTheta,
+            method = 'BFGS',
+            jac = lambda p: self.computeGrad(p, x, y, lmb),
+            options={'disp': True})
+
+        self.theta = self.splitTheta(optimizedTheta)
+
+        return self.theta
 
 #s = SimpleNN()
 #s.setRandomWeights()

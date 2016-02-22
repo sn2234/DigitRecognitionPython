@@ -14,4 +14,8 @@ data = loadmat("..\\ex4data1.mat")
 x = data["X"]
 y = data["y"]
 
-(cost, grad) = s.computeCostGrad(x, y, 1)
+#(cost, grad) = s.computeCostGrad(s.theta, x, y, 1)
+
+predictions = [s.predictClass(w) for w in x]
+
+err_rate = np.mean([1 if pred != check else 0 for (pred, check) in zip(y, predictions)])
