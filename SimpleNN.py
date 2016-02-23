@@ -62,8 +62,8 @@ class SimpleNN:
         theta_reg2[:, 0] = np.zeros((theta_reg2.shape[0],))
 
         theta_grad = [
-            (np.transpose(delta2)@a1)/numberOfSamples + (lmb/numberOfSamples)*np.transpose(theta_reg1),
-            (np.transpose(delta3)@a2)/numberOfSamples + (lmb/numberOfSamples)*np.transpose(theta_reg2)]
+            np.transpose((np.transpose(delta2)@a1)/numberOfSamples + (lmb/numberOfSamples)*np.transpose(theta_reg1)),
+            np.transpose((np.transpose(delta3)@a2)/numberOfSamples + (lmb/numberOfSamples)*np.transpose(theta_reg2))]
 
         return (cost, theta_grad)
 
@@ -90,9 +90,9 @@ class SimpleNN:
         return imax+1
 
     def combineTheta(self, theta):
-        return np.hstack((
-            theta[0].reshape((theta[0].size,)),
-            theta[1].reshape((theta[1].size,))
+        return np.concatenate((
+            theta[0].flatten(),
+            theta[1].flatten()
             ))
 
     def splitTheta(self, combinedTheta):
@@ -107,6 +107,7 @@ class SimpleNN:
     def computeCost(self, combinedTheta, x, y, lmb):
         th = self.splitTheta(combinedTheta)
         (cost, _) = self.computeCostGrad(th, x, y, lmb)
+        print("New cost: {0}".format(cost))
         return cost
 
     def computeGrad(self, combinedTheta, x, y, lmb):
@@ -119,12 +120,12 @@ class SimpleNN:
 
         combinedTheta = self.combineTheta(self.theta)
         optimizedTheta = minimize(
-            lambda p: self.computeCost(p, x, y, lmb),
-            combinedTheta,
+            fun = lambda p: self.computeCost(p, x, y, lmb),
+            x0 = combinedTheta,
             method = 'CG',
             jac = lambda p: self.computeGrad(p, x, y, lmb),
             callback = lambda xk: print("Iteration complete!"),
-            options={'disp': True, 'maxiter' : 5})
+            options={'disp': True}) #'maxiter' : 5, 'eps' : 1e-10, 'gtol' : 1e-10
 
         self.theta = self.splitTheta(optimizedTheta.x)
 
