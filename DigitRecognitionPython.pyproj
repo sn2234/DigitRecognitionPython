@@ -26,6 +26,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DigitRecognitionPython.py" />
+    <Compile Include="NN_1HL.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SimpleNN.py">
       <SubType>Code</SubType>
     </Compile>

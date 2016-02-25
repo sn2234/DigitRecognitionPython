@@ -12,8 +12,8 @@ s.theta = [np.transpose(mat["Theta1"]), np.transpose(mat["Theta2"])]
 
 data = loadmat("..\\ex4data1.mat")
 
-x = data["X"][:1,:]
-y = data["y"][:1,:]
+x = data["X"]
+y = data["y"]
 
 #check_grad(func = lambda p: s.computeCost(s.combineTheta(p), x, y, 0.5),
 #                grad = lambda p: s.computeGrad(s.combineTheta(p), x, y, 0.5),
@@ -21,11 +21,11 @@ y = data["y"][:1,:]
 
 #(cost, grad) = s.computeCostGrad(s.theta, x, y, 1)
 
-#predictions = [s.predictClass(w) for w in x]
-
-#err_rate = np.mean([1 if pred != check else 0 for (pred, check) in zip(y, predictions)])
-
-#print("Error rate with pre-computed paramaters: {0}", err_rate)
-
 s.train(x, y, 0.5)
+
+predictions = [s.predictClass(w) for w in x]
+
+err_rate = np.mean([1 if pred != check else 0 for (pred, check) in zip(y, predictions)])
+
+print("Error rate with pre-computed paramaters: {0}".format(err_rate))
 

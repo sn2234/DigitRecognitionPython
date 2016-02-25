@@ -122,7 +122,7 @@ class SimpleNN:
         optimizedTheta = minimize(
             fun = lambda p: self.computeCost(p, x, y, lmb),
             x0 = combinedTheta,
-            method = 'CG',
+            method = 'TNC',
             jac = lambda p: self.computeGrad(p, x, y, lmb),
             callback = lambda xk: print("Iteration complete!"),
             options={'disp': True}) #'maxiter' : 5, 'eps' : 1e-10, 'gtol' : 1e-10
