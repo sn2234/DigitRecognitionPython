@@ -107,7 +107,7 @@ class SimpleNN:
     def computeCost(self, combinedTheta, x, y, lmb):
         th = self.splitTheta(combinedTheta)
         (cost, _) = self.computeCostGrad(th, x, y, lmb)
-        print("New cost: {0}".format(cost))
+        #print("New cost: {0}".format(cost))
         return cost
 
     def computeGrad(self, combinedTheta, x, y, lmb):
@@ -124,8 +124,8 @@ class SimpleNN:
             x0 = combinedTheta,
             method = 'TNC',
             jac = lambda p: self.computeGrad(p, x, y, lmb),
-            callback = lambda xk: print("Iteration complete!"),
-            options={'disp': True}) #'maxiter' : 5, 'eps' : 1e-10, 'gtol' : 1e-10
+            #callback = lambda xk: print("Iteration complete!"),
+            options={'disp': False}) #'maxiter' : 5, 'eps' : 1e-10, 'gtol' : 1e-10
 
         self.theta = self.splitTheta(optimizedTheta.x)
 
