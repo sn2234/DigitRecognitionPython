@@ -1,8 +1,10 @@
+
 import numpy as np
 from scipy.io import loadmat
 from scipy.optimize import check_grad
 
 import SimpleNN
+import Train
 
 mat = loadmat('..\\ex4weights.mat')
 
@@ -12,8 +14,8 @@ s.theta = [np.transpose(mat["Theta1"]), np.transpose(mat["Theta2"])]
 
 data = loadmat("..\\ex4data1.mat")
 
-x = data["X"]
-y = data["y"]
+x = data["X"][:500,:]
+y = data["y"][:500]
 
 #check_grad(func = lambda p: s.computeCost(s.combineTheta(p), x, y, 0.5),
 #                grad = lambda p: s.computeGrad(s.combineTheta(p), x, y, 0.5),
@@ -21,7 +23,7 @@ y = data["y"]
 
 #(cost, grad) = s.computeCostGrad(s.theta, x, y, 1)
 
-s.train(x, y, 0.5)
+s = Train.trainSciPy(s, x, y, 0.05)
 
 predictions = [s.predictClass(w) for w in x]
 

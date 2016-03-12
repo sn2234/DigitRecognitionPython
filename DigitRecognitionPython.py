@@ -9,42 +9,49 @@ from sklearn.metrics import accuracy_score
 
 import DataModel
 import SimpleNN
+import Train
+
+def findBestRegularization(s, x_sub, y_sub):
+    regs = np.linspace(0, 10, 20)
+    reg_acc_cv = []
+    reg_acc_train = []
+    max_acc = 0
+    best_reg = 0
+
+    for r in regs:
+        s = Train.trainSciPy(s, x_sub, y_sub, r)
+
+        acc_cv = accuracy_score(y_cv, [s.predictClass(w) for w in x_cv])
+        acc_train = accuracy_score(y_sub, [s.predictClass(w) for w in x_sub])
+        reg_acc_cv.append(acc_cv)
+        reg_acc_train.append(acc_train)
+
+        if max_acc < acc_cv:
+            max_acc = acc_cv
+            best_reg = r
+
+
+        print("Validating regularization parameter [{0}]; Train accuracy: [{1}] CV accuracy: [{2}]"
+              .format(r, acc_train, acc_cv))
+
+    print("Best reg param: {0} with accuracy on CV dataset: {1}".format(best_reg, max_acc))
+
+    plt.plot(regs, reg_acc_cv);plt.plot(regs, reg_acc_train)
+    plt.show()
+
+    return best_reg
+
 
 (x, y) = DataModel.loadData("..\\train.csv")
 
 (x_train, x_cv, y_train, y_cv) = DataModel.splitData(x, y)
 
-s = SimpleNN.SimpleNN([784, 50, 10])
+s = SimpleNN.SimpleNN([784, 20, 10])
 
 x_sub = x_train[:500,:]
 y_sub = y_train[:500]
 
-regs = np.linspace(0, 10, 20)
-reg_acc_cv = []
-reg_acc_train = []
-max_acc = 0
-best_reg = 0
-
-for r in regs:
-    s.train(x_sub, y_sub, r)
-
-    acc_cv = accuracy_score(y_cv, [s.predictClass(w) for w in x_cv])
-    acc_train = accuracy_score(y_sub, [s.predictClass(w) for w in x_sub])
-    reg_acc_cv.append(acc_cv)
-    reg_acc_train.append(acc_train)
-
-    if max_acc < acc_cv:
-        max_acc = acc_cv
-        best_reg = r
-
-
-    print("Validating regularization parameter [{0}]; Train accuracy: [{1}] CV accuracy: [{2}]"
-          .format(r, acc_train, acc_cv))
-
-print("Best reg param: {0} with accuracy on CV dataset: {1}".format(best_reg, max_acc))
-
-plt.plot(regs, reg_acc_cv);plt.plot(regs, reg_acc_train)
-plt.show()
+bestReg = findBestRegularization(s, x_sub, y_sub)
 
 #clf = svm.SVC(kernel = "rbf", C=0.9)
 

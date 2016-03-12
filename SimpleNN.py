@@ -115,21 +115,21 @@ class SimpleNN:
         (_, grad) = self.computeCostGrad(th, x, y, lmb)
         return self.combineTheta(grad)
 
-    def train(self, x, y, lmb):
-        self.setRandomWeights()
+    #def train(self, x, y, lmb):
+    #    self.setRandomWeights()
 
-        combinedTheta = self.combineTheta(self.theta)
-        optimizedTheta = minimize(
-            fun = lambda p: self.computeCost(p, x, y, lmb),
-            x0 = combinedTheta,
-            method = 'TNC',
-            jac = lambda p: self.computeGrad(p, x, y, lmb),
-            #callback = lambda xk: print("Iteration complete!"),
-            options={'disp': False}) #'maxiter' : 5, 'eps' : 1e-10, 'gtol' : 1e-10
+    #    combinedTheta = self.combineTheta(self.theta)
+    #    optimizedTheta = minimize(
+    #        fun = lambda p: self.computeCost(p, x, y, lmb),
+    #        x0 = combinedTheta,
+    #        method = 'TNC',
+    #        jac = lambda p: self.computeGrad(p, x, y, lmb),
+    #        #callback = lambda xk: print("Iteration complete!"),
+    #        options={'disp': False}) #'maxiter' : 5, 'eps' : 1e-10, 'gtol' : 1e-10
 
-        self.theta = self.splitTheta(optimizedTheta.x)
+    #    self.theta = self.splitTheta(optimizedTheta.x)
 
-        return self.theta
+    #    return self.theta
 
 #s = SimpleNN()
 #s.setRandomWeights()
