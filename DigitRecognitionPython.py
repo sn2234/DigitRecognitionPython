@@ -46,12 +46,17 @@ def findBestRegularization(s, x_sub, y_sub):
 
 (x_train, x_cv, y_train, y_cv) = DataModel.splitData(x, y)
 
-s = SimpleNN.SimpleNN([784, 20, 10])
+s = SimpleNN.SimpleNN([784, 70, 10])
 
 x_sub = x_train[:500,:]
 y_sub = y_train[:500]
 
-bestReg = findBestRegularization(s, x_sub, y_sub)
+#s = Train.trainGradientDescent(s, x_sub, y_sub, 5)
+s = Train.trainSciPy(s, x_sub, y_sub, 5)
+acc_cv = accuracy_score(y_cv, [s.predictClass(w) for w in x_cv])
+print("Accuracy on CV set: {0}", acc_cv)
+
+#bestReg = findBestRegularization(s, x_sub, y_sub)
 
 #clf = svm.SVC(kernel = "rbf", C=0.9)
 

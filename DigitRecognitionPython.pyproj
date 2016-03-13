@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>0c761786-6032-41fa-b1ae-3cccf687dabd</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>TestNN.py</StartupFile>
+    <StartupFile>DigitRecognitionPython.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
