@@ -10,6 +10,7 @@ from sklearn.metrics import accuracy_score
 import DataModel
 import SimpleNN
 import Train
+import NN_1HL
 
 def findBestRegularization(s, x_sub, y_sub):
     regs = np.linspace(0, 10, 20)
@@ -41,21 +42,38 @@ def findBestRegularization(s, x_sub, y_sub):
 
     return best_reg
 
+def test1():
+    (x, y) = DataModel.loadData("..\\train.csv")
 
-(x, y) = DataModel.loadData("..\\train.csv")
+    (x_train, x_cv, y_train, y_cv) = DataModel.splitData(x, y)
 
-(x_train, x_cv, y_train, y_cv) = DataModel.splitData(x, y)
+    x_sub = x_train[:500,:]
+    y_sub = y_train[:500]
 
-s = SimpleNN.SimpleNN([784, 70, 10])
+    s = SimpleNN.SimpleNN([784, 70, 10])
 
-x_sub = x_train[:500,:]
-y_sub = y_train[:500]
+    #s = Train.trainGradientDescent(s, x_sub, y_sub, 5)
+    s = Train.trainSciPy(s, x_sub, y_sub, 5)
+    acc_cv = accuracy_score(y_cv, [s.predictClass(w) for w in x_cv])
+    print("Accuracy on CV set: {0}", acc_cv)
 
-#s = Train.trainGradientDescent(s, x_sub, y_sub, 5)
-s = Train.trainSciPy(s, x_sub, y_sub, 5)
-acc_cv = accuracy_score(y_cv, [s.predictClass(w) for w in x_cv])
-print("Accuracy on CV set: {0}", acc_cv)
+def test2():
+    (x, y) = DataModel.loadData("..\\train.csv")
 
+    y = y.astype(int)
+
+    (x_train, x_cv, y_train, y_cv) = DataModel.splitData(x, y)
+
+    x_sub = x_train[:500,:]
+    y_sub = y_train[:500]
+
+    s = NN_1HL.NN_1HL(reg_lambda = 1, opti_method = 'CG')
+    s.fit(x_sub, y_sub)
+
+    acc_cv = accuracy_score(y_cv, [s.predict(w) for w in x_cv])
+    print("Accuracy on CV set: {0}", acc_cv)
+
+test2()
 #bestReg = findBestRegularization(s, x_sub, y_sub)
 
 #clf = svm.SVC(kernel = "rbf", C=0.9)

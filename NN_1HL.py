@@ -113,7 +113,7 @@ class NN_1HL(object):
         theta2_0 = self.rand_init(self.hidden_layer_size, num_labels)
         thetas0 = self.pack_thetas(theta1_0, theta2_0)
         
-        options = {'maxiter': self.maxiter}
+        options = {'maxiter': self.maxiter, 'disp': True}
         _res = optimize.minimize(self.function, thetas0, jac=self.function_prime, method=self.method, 
                                  args=(input_layer_size, self.hidden_layer_size, num_labels, X, y, 0), options=options)
         
