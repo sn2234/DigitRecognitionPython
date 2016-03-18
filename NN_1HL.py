@@ -1,6 +1,7 @@
 from __future__ import division
 import numpy as np
 from scipy import optimize
+from scipy.special import expit
 
 class NN_1HL(object):
     
@@ -8,7 +9,7 @@ class NN_1HL(object):
         self.reg_lambda = reg_lambda
         self.epsilon_init = epsilon_init
         self.hidden_layer_size = hidden_layer_size
-        self.activation_func = self.sigmoid
+        self.activation_func = expit #self.sigmoid
         self.activation_func_prime = self.sigmoid_prime
         self.method = opti_method
         self.maxiter = maxiter

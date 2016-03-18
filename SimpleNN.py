@@ -32,12 +32,13 @@ class SimpleNN:
         for i in range(y.shape[0]):
             yy[i, int(y[i]-1)] = 1
 
+        ones = np.ones((numberOfSamples, 1))
         # Compute activations
-        a1 = np.hstack((np.ones((numberOfSamples, 1)), x))
-        z2 = a1 @ theta[0]
+        a1 = np.hstack((ones, x))
+        z2 = (theta[0].T @ a1.T).T
 
         a2 = np.hstack((np.ones((numberOfSamples, 1)), expit(z2)))
-        z3 = a2 @ theta[1]
+        z3 = (theta[1].T @ a2.T).T
 
         a3 = expit(z3)
 
