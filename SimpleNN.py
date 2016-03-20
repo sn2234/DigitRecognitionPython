@@ -92,8 +92,8 @@ class SimpleNN:
 
     def combineTheta(self, theta):
         return np.concatenate((
-            theta[0].flatten(),
-            theta[1].flatten()
+            theta[0].T.flatten(),
+            theta[1].T.flatten()
             ))
 
     def splitTheta(self, combinedTheta):
