@@ -32,6 +32,9 @@
     <Compile Include="SimpleNN.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="SimpleNN2.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="TestNN.py">
       <SubType>Code</SubType>
     </Compile>

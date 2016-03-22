@@ -11,6 +11,7 @@ import DataModel
 import SimpleNN
 import Train
 import NN_1HL
+import SimpleNN2
 
 def findBestRegularization(s, x_sub, y_sub):
     regs = np.linspace(0, 10, 20)
@@ -90,27 +91,38 @@ def compareImplementations():
 
     thetas = [s_t.rand_init(784,70), s_t.rand_init(70, 10)]
 
-    cost_t = s_t.function(s_t.pack_thetas(thetas[0].copy(), thetas[1].copy()), 784, 70, 10, x_sub, y_sub, 1)
-#    grad_t = s_t.function_prime(s_t.pack_thetas(thetas[0], thetas[1]), 784, 70, 10, x_sub, y_sub, 1)
-    print(cost_t);
+    cost_t = s_t.function(s_t.pack_thetas(thetas[0].copy(), thetas[1].copy()), 784, 70, 10, x_sub, y_sub, 10)
+    grad_t = s_t.function_prime(s_t.pack_thetas(thetas[0], thetas[1]), 784, 70, 10, x_sub, y_sub, 10)
+    print(cost_t, np.sum(grad_t));
 
-    cost_my = s_my.computeCost(s_my.combineTheta(thetas.copy()), x_sub, y_sub, 1)
-#    grad_my = s_my.computeGrad(s_my.combineTheta(thetas), x_sub, y_sub, 1)
+    cost_my = s_my.computeCost(s_my.combineTheta(thetas.copy()), x_sub, y_sub, 10)
+    grad_my = s_my.computeGrad(s_my.combineTheta(thetas), x_sub, y_sub, 10)
 
+    print(cost_my, np.sum(grad_my))
+
+def compareImplementations2():
+    (x, y) = DataModel.loadData("..\\train.csv")
+
+    y = y.astype(int)
+
+    (x_train, x_cv, y_train, y_cv) = DataModel.splitData(x, y)
+
+    x_sub = x_train[:500,:]
+    y_sub = y_train[:500]
+
+    s_my = SimpleNN2.NeuralNetConfig(784, 70, 10)
+    s_t = NN_1HL.NN_1HL(reg_lambda = 10, opti_method = 'CG')
+
+    np.random.seed(123)
+
+    thetas = [s_t.rand_init(784,70), s_t.rand_init(70, 10)]
+
+    cost_t = s_t.function(s_t.pack_thetas(thetas[0].copy(), thetas[1].copy()), 784, 70, 10, x_sub, y_sub, 10)
+    print(cost_t)
+
+    cost_my = SimpleNN2.computeCost(s_my, thetas[0], thetas[1], x_sub, y_sub, 10)
     print(cost_my)
 
-
-compareImplementations()
+compareImplementations2()
 
 #bestReg = findBestRegularization(s, x_sub, y_sub)
-
-#clf = svm.SVC(kernel = "rbf", C=0.9)
-
-#x_sub = x_train[:1000,:]
-#y_sub = y_train[:1000]
-
-#clf.fit(x_sub, y_sub)
-
-#y_pred = clf.predict(x_cv)
-
-#err_rate = np.mean([1 if a != b else 0 for (a,b) in zip(y_pred, y_cv)])

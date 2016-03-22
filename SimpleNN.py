@@ -30,7 +30,7 @@ class SimpleNN:
         yy = np.zeros((numberOfSamples, self.s[2]))
 
         for i in range(y.shape[0]):
-            yy[i, int(y[i]-1)] = 1
+            yy[i, int(y[i])] = 1
 
         ones = np.ones((numberOfSamples, 1))
         # Compute activations
@@ -54,7 +54,7 @@ class SimpleNN:
         # Compute backproparation gradients
         delta3 = a3 - yy
         delta2 = (
-            np.transpose(theta[1] @ np.transpose(delta3)) * np.hstack((np.ones((numberOfSamples, 1)), sigmoidGradient(z2))))[:,1:]
+            np.transpose(theta[1][1:,:] @ np.transpose(delta3)) * sigmoidGradient(z2))
 
         theta_reg1 = theta[0].copy()
         theta_reg1[:, 0] = np.zeros((theta_reg1.shape[0],))
