@@ -116,12 +116,20 @@ def compareImplementations2():
     np.random.seed(123)
 
     thetas = [s_t.rand_init(784,70), s_t.rand_init(70, 10)]
-
+    
+    # Check costs
     cost_t = s_t.function(s_t.pack_thetas(thetas[0].copy(), thetas[1].copy()), 784, 70, 10, x_sub, y_sub, 10)
-    print(cost_t)
+    print("Cost test: ", cost_t)
 
     cost_my = SimpleNN2.computeCost(s_my, thetas[0], thetas[1], x_sub, y_sub, 10)
-    print(cost_my)
+    print("Cost my: ", cost_my)
+
+    # Check gradients
+    grad_t = s_t.function_prime(s_t.pack_thetas(thetas[0].copy(), thetas[1].copy()), 784, 70, 10, x_sub, y_sub, 10)
+    print("Grad sum test: ", np.sum(grad_t))
+
+    grad_my1, grad_my2 = SimpleNN2.computeGrad(s_my, thetas[0], thetas[1], x_sub, y_sub, 10)
+    print("Grad sum my: ", np.sum(grad_my1) + np.sum(grad_my2))
 
 compareImplementations2()
 

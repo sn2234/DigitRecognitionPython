@@ -29,8 +29,9 @@ def prepareLabels(y, numLabels):
     return yy
 
 def initRandomThetas(nn):
-    th1 = np.random.random((nn.hiddenSize, nn.inputSize + 1)) - 0.5
-    th2 = np.random.random((nn.outputSize, nn.hiddenSize + 1)) - 0.5
+    epsilon_init = 0.12
+    th1 = np.random.random((nn.hiddenSize, nn.inputSize + 1))*2*epsilon_init - epsilon_init
+    th2 = np.random.random((nn.outputSize, nn.hiddenSize + 1))*2*epsilon_init - epsilon_init
 
     return (th1, th2)
 
@@ -58,10 +59,9 @@ def splitThetas(nn, comb):
 # yy => (L * no)
 # th1 => (nh * (ni+1))
 # th2 => (no * (nh+1))
-def computeCost(nn, th1, th2, x, y, reg_lambda):
-    numberOfSamples = x.shape[0]
 
-    yy = prepareLabels(y, nn.outputSize)
+def forwardPropagation(nn, th1, th2, x, yy):
+    numberOfSamples = x.shape[0]
 
     ones = np.ones((numberOfSamples, 1)) # (L * 1)
 
@@ -75,6 +75,16 @@ def computeCost(nn, th1, th2, x, y, reg_lambda):
 
     a3 = expit(z3) # (L * no)
 
+    return a1, z2, a2, z3, a3
+
+
+def computeCost(nn, th1, th2, x, y, reg_lambda):
+    numberOfSamples = x.shape[0]
+
+    yy = prepareLabels(y, nn.outputSize)
+
+    a1, z2, a2, z3, a3 = forwardPropagation(nn, th1, th2, x, yy)
+
     costPositive = (-yy) * xlog(a3)
     costNegative = (1 - yy) * xlog(1 - a3)
 
@@ -83,3 +93,26 @@ def computeCost(nn, th1, th2, x, y, reg_lambda):
     cost = np.sum(costPositive - costNegative)/numberOfSamples + reg
 
     return cost
+
+def computeGrad(nn, th1, th2, x, y, reg_lambda):
+    numberOfSamples = x.shape[0]
+
+    yy = prepareLabels(y, nn.outputSize)
+    ones = np.ones((numberOfSamples, 1)) # (L * 1)
+
+    a1, z2, a2, z3, a3 = forwardPropagation(nn, th1, th2, x, yy)
+
+    delta3 = a3 - yy # (L * no)
+    delta2 = (th2.T @ delta3.T).T * np.hstack((ones, sigmoidGradient(z2))) # (L * (nh+1))
+    delta2 = delta2[:, 1:] # (L * (nh))
+
+    theta1_reg = th1.copy()
+    theta1_reg[:, 0] = np.zeros((th1.shape[0]))
+
+    theta2_reg = th2.copy()
+    theta2_reg[:, 0] = np.zeros((th2.shape[0]))
+
+    thetaGrad1 = (delta2.T @ a1)/numberOfSamples + (reg_lambda/numberOfSamples) * theta1_reg
+    thetaGrad2 = (delta3.T @ a2)/numberOfSamples + (reg_lambda/numberOfSamples) * theta2_reg
+
+    return thetaGrad1, thetaGrad2
