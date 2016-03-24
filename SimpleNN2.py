@@ -60,7 +60,7 @@ def splitThetas(nn, comb):
 # th1 => (nh * (ni+1))
 # th2 => (no * (nh+1))
 
-def forwardPropagation(nn, th1, th2, x, yy):
+def forwardPropagation(nn, th1, th2, x):
     numberOfSamples = x.shape[0]
 
     ones = np.ones((numberOfSamples, 1)) # (L * 1)
@@ -77,13 +77,12 @@ def forwardPropagation(nn, th1, th2, x, yy):
 
     return a1, z2, a2, z3, a3
 
-
 def computeCost(nn, th1, th2, x, y, reg_lambda):
     numberOfSamples = x.shape[0]
 
     yy = prepareLabels(y, nn.outputSize)
 
-    a1, z2, a2, z3, a3 = forwardPropagation(nn, th1, th2, x, yy)
+    a1, z2, a2, z3, a3 = forwardPropagation(nn, th1, th2, x)
 
     costPositive = (-yy) * xlog(a3)
     costNegative = (1 - yy) * xlog(1 - a3)
@@ -100,7 +99,7 @@ def computeGrad(nn, th1, th2, x, y, reg_lambda):
     yy = prepareLabels(y, nn.outputSize)
     ones = np.ones((numberOfSamples, 1)) # (L * 1)
 
-    a1, z2, a2, z3, a3 = forwardPropagation(nn, th1, th2, x, yy)
+    a1, z2, a2, z3, a3 = forwardPropagation(nn, th1, th2, x)
 
     delta3 = a3 - yy # (L * no)
     delta2 = (th2.T @ delta3.T).T * np.hstack((ones, sigmoidGradient(z2))) # (L * (nh+1))
@@ -116,3 +115,31 @@ def computeGrad(nn, th1, th2, x, y, reg_lambda):
     thetaGrad2 = (delta3.T @ a2)/numberOfSamples + (reg_lambda/numberOfSamples) * theta2_reg
 
     return thetaGrad1, thetaGrad2
+
+def predictProbability(nn, th1, th2, x):
+    numberOfSamples = x.shape[0]
+
+    _, _, _, _, a3 = forwardPropagation(nn, th1, th2, x.reshape((1, numberOfSamples)))
+
+    return a3
+
+def predictClass(nn, th1, th2, x):
+    probabilities = predictProbability(nn, th1, th2, x).flatten()
+
+    pmax = 0.0
+    imax = 0
+    for i in range(len(probabilities)):
+        if probabilities[i] > pmax:
+            pmax = probabilities[i]
+            imax = i
+
+    return imax
+
+def computeCostComb(nn, thComb, x, y, reg_lambda):
+    th1, th2 = splitThetas(nn, thComb)
+    return computeCost(nn, th1, th2, x, y, reg_lambda)
+
+def computeGradComb(nn, thComb, x, y, reg_lambda):
+    th1, th2 = splitThetas(nn, thComb)
+    th1p, th2p = computeGrad(nn, th1, th2, x, y, reg_lambda)
+    return combineThetas(th1p, th2p)

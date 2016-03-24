@@ -74,6 +74,21 @@ def test2():
     acc_cv = accuracy_score(y_cv, [s.predict(w) for w in x_cv])
     print("Accuracy on CV set: {0}", acc_cv)
 
+def test3():
+    (x, y) = DataModel.loadData("..\\train.csv")
+
+    (x_train, x_cv, y_train, y_cv) = DataModel.splitData(x, y)
+
+    x_sub = x_train[:500,:]
+    y_sub = y_train[:500]
+
+    s = SimpleNN2.NeuralNetConfig(784, 70, 10)
+
+    #s = Train.trainGradientDescent(s, x_sub, y_sub, 5)
+    th1, th2 = Train.trainSciPy2(s, x_sub, y_sub, 5)
+    acc_cv = accuracy_score(y_cv, [SimpleNN2.predictClass(s, th1, th2, w) for w in x_cv])
+    print("Accuracy on CV set: {0}", acc_cv)
+
 def compareImplementations():
     (x, y) = DataModel.loadData("..\\train.csv")
 
@@ -131,6 +146,6 @@ def compareImplementations2():
     grad_my1, grad_my2 = SimpleNN2.computeGrad(s_my, thetas[0], thetas[1], x_sub, y_sub, 10)
     print("Grad sum my: ", np.sum(grad_my1) + np.sum(grad_my2))
 
-compareImplementations2()
+test3()
 
 #bestReg = findBestRegularization(s, x_sub, y_sub)

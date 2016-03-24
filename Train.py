@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.optimize import minimize
 
+import SimpleNN2
+
 def trainSciPy(net, x, y, lmb):
     net.setRandomWeights()
 
@@ -16,6 +18,22 @@ def trainSciPy(net, x, y, lmb):
     net.theta = net.splitTheta(optimizedTheta.x)
 
     return net
+
+def trainSciPy2(netConfig, x, y, lmb):
+
+    th1, th2 = SimpleNN2.initRandomThetas(netConfig)
+
+    combinedTheta = SimpleNN2.combineThetas(th1, th2)
+
+    optimizedTheta = minimize(
+        fun = lambda p: SimpleNN2.computeCostComb(netConfig, p, x, y, lmb) ,
+        x0 = combinedTheta,
+        method = 'CG',
+        jac = lambda p: SimpleNN2.computeGradComb(netConfig, p, x, y, lmb),
+        #callback = lambda xk: print("Iteration complete!"),
+        options={'disp': True}) #'maxiter' : 5, 'eps' : 1e-10, 'gtol' : 1e-10
+
+    return SimpleNN2.splitThetas(netConfig, optimizedTheta.x)
 
 def trainGradientDescent(net, x, y, lmb):
     net.setRandomWeights()
