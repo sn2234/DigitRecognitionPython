@@ -152,14 +152,29 @@ def compareImplementations2():
 #test3()
 
 
+#(x, y) = DataModel.loadData("..\\train.csv")
+
+#(x_train, x_cv, y_train, y_cv) = DataModel.splitData(x, y)
+
+#subsetLen = 200
+#x_sub = x_train[:subsetLen,:]
+#y_sub = y_train[:subsetLen]
+
+#s = SimpleNN2.NeuralNetConfig(784, 70, 10)
+#bestReg = findBestRegularization(s, x_sub, y_sub)
+
+
+
 (x, y) = DataModel.loadData("..\\train.csv")
 
 (x_train, x_cv, y_train, y_cv) = DataModel.splitData(x, y)
 
-subsetLen = 200
-x_sub = x_train[:subsetLen,:]
-y_sub = y_train[:subsetLen]
-
 s = SimpleNN2.NeuralNetConfig(784, 70, 10)
-bestReg = findBestRegularization(s, x_sub, y_sub)
 
+regLambda = 6.84
+#s = Train.trainGradientDescent(s, x_sub, y_sub, 5)
+th1, th2 = Train.trainSGD(s, x_train, y_train, regLambda)
+#th1, th2 = Train.trainGradientDescent2(s, x_sub, y_sub, 5)
+
+acc_cv = accuracy_score(y_cv, [SimpleNN2.predictClass(s, th1, th2, w) for w in x_cv])
+print("Accuracy on CV set: {0}", acc_cv)
