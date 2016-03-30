@@ -125,21 +125,21 @@ def trainGradientDescent2(netConfig, x, y, lmb):
 def trainSGD(netConfig, x, y, lmb):
     th1, th2 = SimpleNN2.initRandomThetas(netConfig)
 
-    alpha = 0.001
+    alpha = 0.09
     costs = []
 
     numSamples = x.shape[0]
+    miniBatchSize = 10
 
-    for i in range(numSamples):
+    for i in range((numSamples-2)//miniBatchSize):
 
-        xi = x[i:i+1,:]
-        yi = y[i:i+1]
+        fr = i*miniBatchSize
+        to = (i+1)*miniBatchSize
 
-        costBefore = 0.0
-        if len(costs) > 0:
-            costBefore = costs[-1]
-        else:
-            costBefore = SimpleNN2.computeCost(netConfig, th1, th2, xi, yi, lmb)
+        xi = x[fr:to,:]
+        yi = y[fr:to]
+
+        #costBefore = SimpleNN2.computeCost(netConfig, th1, th2, xi, yi, lmb)
 
         grad1, grad2 = SimpleNN2.computeGrad(netConfig, th1, th2, xi, yi, lmb)
 
@@ -158,11 +158,11 @@ def trainSGD(netConfig, x, y, lmb):
             th2 = th2p
             break
 
-        if len(costs) > 0 and len(costs) % 10 == 0:
+        if len(costs) > 0 and len(costs) % 100 == 0:
             print('Epoch', len(costs), 'with cost', costs[-1], 'and alpha', alpha)
 
-        if len(costs) > 2 and abs(costs[-2] - costs[-1]) < 0.00001:
-            print("Decrease alpha due to close costs")
-            alpha = alpha / 1.05
+        #if len(costs) > 2 and abs(costs[-2] - costs[-1]) < 0.00001:
+        #    print("Decrease alpha due to close costs")
+        #    alpha = alpha / 1.05
 
     return th1, th2
