@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 from scipy.optimize import minimize
 
@@ -122,14 +123,31 @@ def trainGradientDescent2(netConfig, x, y, lmb):
     
     return th1, th2
 
+def findOptimalAlpha(netConfig, theta1, theta2, x, y, lmb, grad1, grad2, alphaFrom, alphaTo):
+    alphas = np.linspace(alphaFrom, alphaTo, 15)
+    bestAlpha = 0
+    bestCost = sys.float_info.max
+
+    for a in alphas:
+        theta1p = theta1 - a*grad1
+        theta2p = theta2 - a*grad2
+
+        cost = SimpleNN2.computeCost(netConfig, theta1p, theta2p, x, y, lmb)
+        if cost < bestCost:
+            bestCost = cost
+            bestAlpha = a
+    
+    return bestAlpha
+
+
 def trainSGD(netConfig, x, y, lmb):
     th1, th2 = SimpleNN2.initRandomThetas(netConfig)
 
-    alpha = 0.09
+    alpha = 0.1
     costs = []
 
     numSamples = x.shape[0]
-    miniBatchSize = 1
+    miniBatchSize = 200
 
     for i in range((numSamples-2)//miniBatchSize):
 
@@ -148,6 +166,8 @@ def trainSGD(netConfig, x, y, lmb):
 
         grad1, grad2 = SimpleNN2.computeGrad(netConfig, th1, th2, xi, yi, lmb)
 
+        alpha = findOptimalAlpha(netConfig, th1, th2, xi, yi, lmb, grad1, grad2, alpha/2, alpha*2)
+
         th1p = th1 - alpha*grad1
         th2p = th2 - alpha*grad2
 
@@ -157,10 +177,20 @@ def trainSGD(netConfig, x, y, lmb):
             costs.append(costAfter)
             th1 = th1p
             th2 = th2p
-        else:
-            # Find optimal alpha
+        #else:
+        #    # Find optimal alpha in a wide range
+        #    alpha = findOptimalAlpha(netConfig, th1, th2, xi, yi, lmb, grad1, grad2, alpha/50, alpha)
+        #    th1p = th1 - alpha*grad1
+        #    th2p = th2 - alpha*grad2
 
-        if len(costs) > 0 and len(costs) % 100 == 0:
+        #    costAfter = SimpleNN2.computeCost(netConfig, th1p, th2p, xi, yi, lmb)
+
+        #    if costAfter <= costBefore:
+        #        costs.append(costAfter)
+        #        th1 = th1p
+        #        th2 = th2p
+
+        if len(costs) > 0 and len(costs) % 10 == 0:
             print('Epoch', len(costs), 'with cost', costs[-1], 'and alpha', alpha)
 
     return th1, th2
