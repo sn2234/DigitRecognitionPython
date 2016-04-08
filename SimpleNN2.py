@@ -2,6 +2,7 @@ import numpy as np
 import math as m
 from scipy.special import expit
 from scipy.optimize import minimize
+import pickle
 
 def sigmoidGradient(x):
     t = expit(x)
@@ -143,3 +144,13 @@ def computeGradComb(nn, thComb, x, y, reg_lambda):
     th1, th2 = splitThetas(nn, thComb)
     th1p, th2p = computeGrad(nn, th1, th2, x, y, reg_lambda)
     return combineThetas(th1p, th2p)
+
+def saveNetwork(nn, th1, th2, filePath):
+    with open(filePath, "wb") as f:
+        pickle.dump((nn, th1, th2), f)
+
+def loadNetwork(filePath):
+    with open(filePath, "rb") as f:
+        (nn, th1, th2) = pickle.load(f)
+        return (nn, th1, th2)
+
