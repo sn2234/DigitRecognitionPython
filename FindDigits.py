@@ -23,6 +23,8 @@ sliceSizeY = 28
 xSlices = img.shape[1] // sliceSizeX
 ySlices = img.shape[0] // sliceSizeY
 
+imgMod = img.copy()
+
 for x in range(xSlices):
     for y in range(ySlices):
         xFr = x*sliceSizeX
@@ -34,12 +36,16 @@ for x in range(xSlices):
         subImage = img[yFr:yTo, xFr:xTo]
 
         #prob = SimpleNN2.predictProbability(nn, th1, th2, subImage.flatten()).flatten()
-        cl = SimpleNN2.predictClass(nn, th1, th2, subImage.flatten())
+        cl = SimpleNN2.predictProbability(nn, th1, th2, subImage.flatten()).flatten()
 
-        if cl == 3:
-            plt.imshow(subImage.reshape((28,28)))
-            break
+        if cl[3] > 0.25 :
+            print("Found at ({0},{1})".format(y, x))
+            imgMod[yFr:yTo, xFr:xTo] *= 0.5
+            #plt.imshow(subImage.reshape((28,28)))
+            #break
 
+plt.imshow(img, cmap=cm.gray)
+plt.imshow(imgMod, cmap=cm.gray)
 #for x in range(xSlices):
 #    for y in range(ySlices):
 #        xFr = x*sliceSizeX
