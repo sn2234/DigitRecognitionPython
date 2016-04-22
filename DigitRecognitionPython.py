@@ -168,6 +168,20 @@ def trainFullAndSave():
     print("Accuracy on CV set: {0}".format(acc_cv))
 
     SimpleNN2.saveNetwork(s, th1, th2, "..\\NeuralNetwork.bin")
+
+def makeTestPerdictions():
+    x, _ = DataModel.loadData("..\\test.csv")
+    s, th1, th2 = SimpleNN2.loadNetwork("..\\NeuralNetwork.bin")
+    
+    y = [SimpleNN2.predictClass(s, th1, th2, w) for w in x]
+    
+    with open("results.csv", "w") as f:
+        imageId = 1
+        f.write("ImageId,Label\n")
+        for i in y:
+            f.write("{0},{1}\n".format(imageId, i))
+            imageId = imageId + 1
+    
 #test3()
 
 
@@ -182,7 +196,7 @@ def trainFullAndSave():
 #s = SimpleNN2.NeuralNetConfig(784, 70, 10)
 #bestReg = findBestRegularization(s, x_sub, y_sub)
 
-trainFullAndSave()
+makeTestPerdictions()
 
 #(x, y) = DataModel.loadData("..\\train.csv")
 
