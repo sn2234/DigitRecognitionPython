@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>0c761786-6032-41fa-b1ae-3cccf687dabd</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>DigitRecognitionPython.py</StartupFile>
+    <StartupFile>FindDigits.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -26,6 +26,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DigitRecognitionPython.py" />
+    <Compile Include="FindDigits.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="NN_1HL.py">
       <SubType>Code</SubType>
     </Compile>

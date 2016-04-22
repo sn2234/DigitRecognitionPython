@@ -3,7 +3,6 @@ import sys
 import numpy as np
 import matplotlib.image as img
 import matplotlib.pyplot as plt
-from sklearn import svm
 from sklearn.metrics import accuracy_score
 
 
